@@ -67,9 +67,16 @@ st.markdown("""
     --border: #E5DDC9; --border-strong: #D4CCB9;
     --muted: #5A5A5A; --rust: #A0432C; --rust-soft: #F2E5DE; --moss: #6B7A4F;
 }
-html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, label,
+html, body, [class*="css"], .stApp, .stMarkdown, p, div, label,
 .stSelectbox, .stRadio, .stTextInput, .stTextArea, .stButton, .stDownloadButton {
     font-family: 'Manrope', system-ui, sans-serif !important;
+}
+/* Preserve Material Icons / Symbols fonts — Streamlit uses these for chevrons, upload, close, etc. */
+.material-symbols-rounded, .material-symbols-outlined, .material-icons,
+[class*="material-symbols"], [class*="material-icons"],
+[data-testid*="Icon"], [data-testid*="icon"],
+span[aria-hidden="true"][class*="st-emotion"] {
+    font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', 'Material Icons' !important;
 }
 .display, h1.display, h2.display, h3.display {
     font-family: 'Instrument Serif', Georgia, serif !important;
@@ -125,6 +132,26 @@ html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, label,
 }
 /* Expander headers */
 [data-testid="stExpander"] summary { color: var(--ink) !important; }
+
+/* File uploader — fix dark default styling that didn't match cream theme */
+[data-testid="stFileUploader"] section,
+[data-testid="stFileUploaderDropzone"] {
+    background-color: var(--card) !important;
+    border: 1px dashed var(--border-strong) !important;
+    color: var(--ink) !important;
+}
+[data-testid="stFileUploader"] section *,
+[data-testid="stFileUploaderDropzone"] * { color: var(--ink) !important; }
+[data-testid="stFileUploader"] section button {
+    background-color: var(--rust) !important;
+    color: var(--cream) !important;
+    border: none !important;
+}
+[data-testid="stFileUploader"] section button * { color: var(--cream) !important; }
+[data-testid="stFileUploader"] section small { color: var(--muted) !important; }
+
+/* Tooltips and help icons */
+[data-testid="stTooltipIcon"] { color: var(--muted) !important; }
 .stButton button { background: var(--rust); color: var(--cream); border: none;
                    border-radius: 2px; font-weight: 500; transition: background 0.15s; }
 .stButton button:hover { background: #8a3a25; color: var(--cream); }
@@ -191,6 +218,10 @@ footer { visibility: hidden; height: 0; }
 .landing-feature p  { font-size: 14px; color: var(--muted); line-height: 1.6; margin: 0; }
 .landing-feature .feature-num { font-family: 'Instrument Serif', serif; font-style: italic;
                                   color: var(--rust); font-size: 14px; }
+.landing-feature .feature-icon { color: var(--rust); margin-bottom: 16px;
+                                  display: inline-flex; align-items: center; justify-content: center;
+                                  width: 56px; height: 56px; border-radius: 50%;
+                                  background: var(--rust-soft); }
 
 .landing-closing { padding: 80px 0 40px; border-top: 1px solid var(--border); }
 .landing-closing-title { font-family: 'Instrument Serif', serif; font-size: 42px; line-height: 1.1;
@@ -816,16 +847,38 @@ def render_landing():
 
       <div class="landing-features">
         <div class="landing-feature">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" fill-opacity="0.15"/>
+            </svg>
+          </div>
           <div class="feature-num">i.</div>
           <h3>Guide</h3>
           <p>Six checkpoint questions route your team to the right schedule template. Five route them to the right change classification. The decision tree is configurable — adjust tags to change routing without touching code.</p>
         </div>
         <div class="landing-feature">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </div>
           <div class="feature-num">ii.</div>
           <h3>Route</h3>
           <p>Submissions auto-assign to the best-fit reviewer based on expertise overlap and current load. Three workflow types, configurable approval chains, capacity-aware. Reviewers see only their queue.</p>
         </div>
         <div class="landing-feature">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
           <div class="feature-num">iii.</div>
           <h3>Surface</h3>
           <p>SLA breaches flag in red on every page. The Gantt timeline reveals aging items at a glance. Claude pre-screens uploaded documents so your team leads see focused reviews instead of blank pages.</p>
@@ -932,7 +985,7 @@ def render_first_run():
 # ============================================================================
 def render_home():
     user = current_user()
-    greet = f"Welcome back, {user['name'].split()[0]}." if user else "Hand the routine work to the structure."
+    greet = f"Welcome back, {user['name']}." if user else "Hand the routine work to the structure."
 
     st.markdown('<div class="eyebrow">Today at the bench</div>'
                 f'<h1 class="display" style="font-size:42px;margin:0 0 8px 0">{greet}</h1>'
@@ -1053,25 +1106,48 @@ def render_submit():
         section_title("New submission", "What are you submitting?")
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown('<div class="card"><div class="eyebrow">Scheduling team</div>'
-                        '<div class="display" style="font-size:24px;margin-bottom:6px">'
+            st.markdown('<div class="card" style="text-align:center;padding:32px 20px">'
+                        '<div style="display:inline-flex;align-items:center;justify-content:center;'
+                        'width:56px;height:56px;border-radius:50%;background:#E0E5DA;'
+                        'color:#4A5A3A;margin-bottom:12px">'
+                        '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+                        'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+                        '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>'
+                        '<line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>'
+                        '<line x1="3" y1="10" x2="21" y2="10"/></svg></div>'
+                        '<div class="eyebrow">Scheduling team</div>'
+                        '<div class="display" style="font-size:24px;margin:6px 0">'
                         "Schedule template</div>"
-                        "<p style='color:var(--muted);font-size:14px'>Walk through 6 checkpoints "
-                        "to pick the right schedule template for your project.</p></div>",
+                        "<p style='color:var(--muted);font-size:13px;line-height:1.5;margin:0'>"
+                        "Walk through 6 checkpoints to pick the right schedule template "
+                        "for your project.</p></div>",
                         unsafe_allow_html=True)
-            if st.button("Start schedule wizard", key="start_schedule"):
+            if st.button("Start schedule wizard →", key="start_schedule",
+                          use_container_width=True):
                 st.session_state.wizard_kind = "schedule"
                 st.session_state.wizard_step = 0
                 st.session_state.wizard_answers = {}
                 st.rerun()
         with c2:
-            st.markdown('<div class="card"><div class="eyebrow">Change management team</div>'
-                        '<div class="display" style="font-size:24px;margin-bottom:6px">'
+            st.markdown('<div class="card" style="text-align:center;padding:32px 20px">'
+                        '<div style="display:inline-flex;align-items:center;justify-content:center;'
+                        'width:56px;height:56px;border-radius:50%;background:var(--rust-soft);'
+                        'color:var(--rust);margin-bottom:12px">'
+                        '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+                        'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+                        '<polyline points="17 1 21 5 17 9"/>'
+                        '<path d="M3 11V9a4 4 0 0 1 4-4h14"/>'
+                        '<polyline points="7 23 3 19 7 15"/>'
+                        '<path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>'
+                        '<div class="eyebrow">Change management team</div>'
+                        '<div class="display" style="font-size:24px;margin:6px 0">'
                         "Change request</div>"
-                        "<p style='color:var(--muted);font-size:14px'>Classify a change correctly "
-                        "before submitting — Standard, Normal, Major, or Emergency.</p></div>",
+                        "<p style='color:var(--muted);font-size:13px;line-height:1.5;margin:0'>"
+                        "Classify a change correctly before submitting — Standard, Normal, "
+                        "Major, or Emergency.</p></div>",
                         unsafe_allow_html=True)
-            if st.button("Start change wizard", key="start_change"):
+            if st.button("Start change wizard →", key="start_change",
+                          use_container_width=True):
                 st.session_state.wizard_kind = "change"
                 st.session_state.wizard_step = 0
                 st.session_state.wizard_answers = {}
