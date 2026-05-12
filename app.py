@@ -45,6 +45,12 @@ try:
 except ImportError:
     _BCRYPT_AVAILABLE = False
 
+try:
+    from user_guide import generate_user_guide_pdf
+    _USER_GUIDE_AVAILABLE = True
+except ImportError:
+    _USER_GUIDE_AVAILABLE = False
+
 # ============================================================================
 # PAGE CONFIG
 # ============================================================================
@@ -260,9 +266,6 @@ footer { visibility: hidden; height: 0; }
 
 .landing-hero { padding: 80px 0 100px; display: grid; grid-template-columns: 1.4fr 1fr;
                 gap: 80px; align-items: center; }
-.landing-hero-title { font-family: 'Instrument Serif', serif; font-size: 78px;
-                      line-height: 0.95; margin: 18px 0 28px; color: var(--ink); font-weight: 400; }
-.landing-hero-title em { color: var(--rust); font-style: italic; }
 .landing-hero-sub { font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 480px;
                     margin-bottom: 0; }
 
@@ -319,10 +322,6 @@ footer { visibility: hidden; height: 0; }
 .landing-feature .feature-icon svg { width: 44px; height: 44px; }
 
 .landing-closing { padding: 80px 0 40px; border-top: 1px solid var(--border); }
-.landing-closing-title { font-family: 'Instrument Serif', serif; font-size: 42px; line-height: 1.1;
-                          color: var(--ink); margin: 0 0 16px; max-width: 700px; }
-.landing-closing-title em { font-style: italic; color: var(--rust); }
-.landing-closing-body { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 580px; }
 
 .landing-footer { padding: 40px 0 0; border-top: 1px solid var(--border); margin-top: 60px;
                    font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em;
@@ -333,6 +332,99 @@ footer { visibility: hidden; height: 0; }
     .landing-hero-title { font-size: 52px; }
     .landing-features { grid-template-columns: 1fr; gap: 32px; padding: 40px 0; }
     .landing-closing-title { font-size: 30px; }
+}
+
+/* ===== Landing page animations ===== */
+@keyframes slideUpFade {
+    from { transform: translateY(24px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes drawAccent {
+    from { width: 0; }
+    to   { width: 64px; }
+}
+@keyframes floatSubtle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-4px) rotate(-2deg); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(160, 67, 44, 0.25); }
+    50%      { box-shadow: 0 0 0 8px rgba(160, 67, 44, 0); }
+}
+
+.landing-hero-title { font-family: 'Instrument Serif', serif; font-size: 78px;
+                      line-height: 0.95; margin: 18px 0 28px; color: var(--ink); font-weight: 400; }
+.landing-hero-title .hero-line { display: block; opacity: 0;
+                                  animation: slideUpFade 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.landing-hero-title .hero-line:nth-child(1) { animation-delay: 0.10s; }
+.landing-hero-title .hero-line:nth-child(2) { animation-delay: 0.30s; }
+.landing-hero-title .hero-line:nth-child(3) { animation-delay: 0.50s; }
+.landing-hero-title em { color: var(--rust); font-style: italic; }
+
+.landing-hero-accent { width: 0; height: 3px; background: var(--rust);
+                        margin: 0 0 24px 0;
+                        animation: drawAccent 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                        animation-delay: 0.85s; }
+
+.landing-hero-sub { opacity: 0;
+                     animation: slideUpFade 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                     animation-delay: 0.95s; }
+
+.landing-brand-mark { animation: floatSubtle 4s ease-in-out infinite; }
+
+.landing-visual { opacity: 0;
+                   animation: fadeIn 1.4s ease-out forwards;
+                   animation-delay: 0.6s; }
+
+.landing-benefit { opacity: 0;
+                    animation: slideUpFade 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.landing-benefit:nth-child(1) { animation-delay: 1.05s; }
+.landing-benefit:nth-child(2) { animation-delay: 1.20s; }
+.landing-benefit:nth-child(3) { animation-delay: 1.35s; }
+.landing-benefit:nth-child(4) { animation-delay: 1.50s; }
+.landing-benefit-icon { transition: transform 0.25s ease-out, border-color 0.25s ease-out,
+                                    background 0.25s ease-out; }
+.landing-benefit:hover .landing-benefit-icon { transform: scale(1.1) rotate(-4deg);
+                                                  background: var(--rust-soft);
+                                                  border-color: var(--rust); }
+
+.landing-feature { opacity: 0;
+                    animation: slideUpFade 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.landing-feature:nth-child(1) { animation-delay: 1.70s; }
+.landing-feature:nth-child(2) { animation-delay: 1.85s; }
+.landing-feature:nth-child(3) { animation-delay: 2.00s; }
+.landing-feature .feature-icon { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.landing-feature:hover .feature-icon { transform: rotate(-6deg) scale(1.06); }
+
+.landing-closing-title { font-family: 'Instrument Serif', serif; font-size: 42px; line-height: 1.1;
+                          color: var(--ink); margin: 0 0 16px; max-width: 700px;
+                          opacity: 0;
+                          animation: slideUpFade 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                          animation-delay: 2.20s; }
+.landing-closing-title em { font-style: italic; color: var(--rust); }
+.landing-closing-body { opacity: 0;
+                         animation: slideUpFade 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+                         animation-delay: 2.35s; }
+
+/* Bottom CTA button — subtle attention pulse */
+button[key="landing_signin_bottom"], button[key="landing_signin_top"] {
+    animation: glow 2.4s ease-out infinite;
+    animation-delay: 2.6s;
+}
+
+/* Respect accessibility preference */
+@media (prefers-reduced-motion: reduce) {
+    .landing-hero-title .hero-line, .landing-hero-accent, .landing-hero-sub,
+    .landing-visual, .landing-benefit, .landing-feature,
+    .landing-closing-title, .landing-closing-body {
+        animation: none !important; opacity: 1 !important; transform: none !important;
+        width: 64px;
+    }
+    .landing-brand-mark { animation: none !important; }
 }
 
 /* Login card */
@@ -962,7 +1054,8 @@ def render_landing():
 <div class="landing-hero">
 <div>
 <div class="eyebrow">A workbench for project teams</div>
-<h1 class="landing-hero-title">Hand the<br><em>routine work</em><br>to the structure.</h1>
+<h1 class="landing-hero-title"><span class="hero-line">Hand the</span><span class="hero-line"><em>routine work</em></span><span class="hero-line">to the structure.</span></h1>
+<div class="landing-hero-accent"></div>
 <p class="landing-hero-sub">Decision-tree wizards for scheduling and change management. Reviewer routing. Document pre-screening. SLA breach alerts. Built for supervisors averaging 60-hour weeks who'd like to stop.</p>
 </div>
 <div class="landing-visual">{DECISION_TREE_SVG}</div>
@@ -1936,6 +2029,137 @@ def render_documents():
                 "Analysis output will appear here.</div>", unsafe_allow_html=True)
 
 # ============================================================================
+# PAGE: HELP
+# ============================================================================
+
+@st.cache_data(show_spinner=False)
+def cached_user_guide_pdf():
+    """Generate the user guide once per session, cache the bytes."""
+    if not _USER_GUIDE_AVAILABLE:
+        return None
+    try:
+        return generate_user_guide_pdf()
+    except Exception as e:
+        return None
+
+
+def render_help():
+    section_title("Reference", "Help & user guide",
+                  kicker="Everything your team needs to use Hughes Guide effectively. "
+                         "Download the full guide as a PDF, or read the quick-start below.")
+
+    pdf_bytes = cached_user_guide_pdf()
+
+    # Download card
+    if pdf_bytes:
+        c1, c2 = st.columns([3, 2])
+        with c1:
+            st.markdown('<div class="card feature" style="padding:24px">'
+                        '<div style="display:inline-flex;align-items:center;'
+                        'justify-content:center;width:48px;height:48px;border-radius:50%;'
+                        'background:var(--rust-soft);color:var(--rust);margin-bottom:14px">'
+                        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" '
+                        'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '
+                        'stroke-linejoin="round">'
+                        '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'
+                        '<polyline points="14 2 14 8 20 8"/>'
+                        '<line x1="16" y1="13" x2="8" y2="13"/>'
+                        '<line x1="16" y1="17" x2="8" y2="17"/>'
+                        '<polyline points="10 9 9 9 8 9"/></svg></div>'
+                        '<div class="eyebrow">Downloadable</div>'
+                        '<div class="display" style="font-size:24px;margin:4px 0 8px 0">'
+                        "Hughes Guide User Guide</div>"
+                        "<p style='color:var(--muted);font-size:14px;line-height:1.5;"
+                        "margin-bottom:12px'>"
+                        "Sixteen pages covering roles, workflows, wizards, reviewing, SLA tracking, "
+                        "admin configuration, troubleshooting, and a glossary. "
+                        f"Roughly {len(pdf_bytes)//1024} KB.</p></div>",
+                        unsafe_allow_html=True)
+            st.download_button(
+                "⬇  Download user guide (PDF)",
+                data=pdf_bytes,
+                file_name=f"hughes_guide_user_guide_{datetime.utcnow().strftime('%Y%m')}.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+            )
+        with c2:
+            st.markdown('<div class="card" style="padding:24px">'
+                        '<div class="eyebrow">Quick links</div>'
+                        '<div class="label" style="margin-top:8px">Inside the guide</div>'
+                        '<div style="font-size:13px;line-height:1.7;color:var(--ink)">'
+                        '• About Hughes Guide<br>'
+                        '• Getting access<br>'
+                        '• Roles &amp; permissions<br>'
+                        '• Submitting work<br>'
+                        '• Reviewing as a team lead<br>'
+                        '• Final QA approvals<br>'
+                        '• Timeline view<br>'
+                        '• Document pre-screening<br>'
+                        '• SLA tracking<br>'
+                        '• Admin: managing users<br>'
+                        '• Admin: customizing templates<br>'
+                        '• Troubleshooting &amp; FAQ<br>'
+                        '• Glossary'
+                        '</div></div>', unsafe_allow_html=True)
+    else:
+        st.error("**User guide generator not available.** Make sure `reportlab` is installed "
+                 "and `user_guide.py` exists alongside `app.py` in your repo.")
+
+    # In-app quick start
+    st.markdown('<div class="section-divider">'
+                '<span class="section-divider-mark">&iexcl;</span>'
+                '<span style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;'
+                'color:var(--muted);font-weight:600">Quick start</span>'
+                '<span class="section-divider-mark">!</span>'
+                '</div>', unsafe_allow_html=True)
+
+    user = current_user()
+    role = user.get("role") if user else "viewer"
+
+    if role == "admin":
+        st.markdown('<div class="card"><div class="label">For administrators</div>'
+                    "<p style='font-size:14px;line-height:1.6;color:var(--ink)'>"
+                    "<strong>1.</strong> Add your real team members in <b>Settings → Users &amp; Access</b>, "
+                    "assign each the right role (Team Lead, Submitter, Viewer).<br>"
+                    "<strong>2.</strong> Add your team leads as reviewers in <b>Settings → Team leads / reviewers</b> "
+                    "with their expertise tags and capacity.<br>"
+                    "<strong>3.</strong> Review the templates and change types in Settings — edit names, "
+                    "tags, SLAs, and approval chains to match your organisation.<br>"
+                    "<strong>4.</strong> Share the app URL plus username/password with each team member. "
+                    "Tell them to change their password from Settings on first login.<br>"
+                    "<strong>5.</strong> The Pipeline will fill in as your team submits. You'll see "
+                    "items at <em>Final QA / QC</em> stage waiting for your sign-off.</p></div>",
+                    unsafe_allow_html=True)
+    elif role == "lead":
+        st.markdown('<div class="card"><div class="label">For team leads</div>'
+                    "<p style='font-size:14px;line-height:1.6;color:var(--ink)'>"
+                    "<strong>1.</strong> Open <b>Pipeline</b> to see items assigned for review.<br>"
+                    "<strong>2.</strong> Click <b>Open →</b> on any item to read submitter notes, criteria, "
+                    "risk score, and SLA status.<br>"
+                    "<strong>3.</strong> Click <b>Advance to next stage</b> to approve, or <b>Return to "
+                    "submitter</b> with a note if rework is needed.<br>"
+                    "<strong>4.</strong> Use <b>Documents</b> to pre-screen any uploaded PDFs before reviewing.</p></div>",
+                    unsafe_allow_html=True)
+    elif role == "submitter":
+        st.markdown('<div class="card"><div class="label">For submitters</div>'
+                    "<p style='font-size:14px;line-height:1.6;color:var(--ink)'>"
+                    "<strong>1.</strong> Click <b>Submit</b> in the sidebar.<br>"
+                    "<strong>2.</strong> Choose <b>Schedule template</b> or <b>Change request</b>.<br>"
+                    "<strong>3.</strong> Answer the wizard questions — the system recommends the right "
+                    "template or classification automatically.<br>"
+                    "<strong>4.</strong> Confirm details and submit. Your item appears in <b>Pipeline</b>.<br>"
+                    "<strong>5.</strong> Track its progress; you'll see when a reviewer advances or "
+                    "returns it.</p></div>",
+                    unsafe_allow_html=True)
+    else:  # viewer
+        st.markdown('<div class="card"><div class="label">For viewers</div>'
+                    "<p style='font-size:14px;line-height:1.6;color:var(--ink)'>"
+                    "You have read-only access. Open <b>Pipeline</b> to see every submission. "
+                    "Use <b>Timeline</b> for the Gantt-style aging view. You won't see action buttons "
+                    "— that's intentional. Contact your administrator if you need a higher role.</p></div>",
+                    unsafe_allow_html=True)
+
+# ============================================================================
 # PAGE: SETTINGS
 # ============================================================================
 FEATURE_META = [
@@ -2309,6 +2533,7 @@ def render_authenticated_app():
                 pages.append("Timeline")
         if has_perm("analyze_docs") and st.session_state.features.get("documentAnalysis"):
             pages.append("Documents")
+        pages.append("Help")
         pages.append("Settings")
 
         new_page = st.radio("Navigate", pages,
@@ -2347,6 +2572,7 @@ def render_authenticated_app():
     elif page == "Pipeline": render_pipeline()
     elif page == "Timeline": render_timeline()
     elif page == "Documents": render_documents()
+    elif page == "Help": render_help()
     elif page == "Settings": render_settings()
 
 
