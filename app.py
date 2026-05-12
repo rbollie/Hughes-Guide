@@ -152,12 +152,51 @@ span[aria-hidden="true"][class*="st-emotion"] {
 
 /* Tooltips and help icons */
 [data-testid="stTooltipIcon"] { color: var(--muted) !important; }
-.stButton button { background: var(--rust); color: var(--cream); border: none;
-                   border-radius: 2px; font-weight: 500; transition: background 0.15s; }
-.stButton button:hover { background: #8a3a25; color: var(--cream); }
-.stButton button[kind="secondary"] { background: transparent; color: var(--ink);
-                                      border: 1px solid var(--border-strong); }
-.stButton button[kind="secondary"]:hover { background: #E8E2D5; color: var(--ink); }
+.stButton button, .stFormSubmitButton button,
+button[kind="primary"], button[kind="primaryFormSubmit"] {
+    background: var(--rust) !important;
+    color: var(--cream) !important;
+    border: none !important;
+    border-radius: 2px !important;
+    font-weight: 500 !important;
+    transition: background 0.15s;
+}
+.stButton button *, .stFormSubmitButton button *,
+button[kind="primary"] *, button[kind="primaryFormSubmit"] * {
+    color: var(--cream) !important;
+}
+.stButton button:hover, .stFormSubmitButton button:hover,
+button[kind="primary"]:hover, button[kind="primaryFormSubmit"]:hover {
+    background: #8a3a25 !important;
+    color: var(--cream) !important;
+}
+
+/* Secondary buttons — outlined, ink text on cream */
+.stButton button[kind="secondary"], .stFormSubmitButton button[kind="secondaryFormSubmit"],
+button[kind="secondary"], button[kind="secondaryFormSubmit"] {
+    background: transparent !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--border-strong) !important;
+}
+.stButton button[kind="secondary"] *, .stFormSubmitButton button[kind="secondaryFormSubmit"] *,
+button[kind="secondary"] *, button[kind="secondaryFormSubmit"] * {
+    color: var(--ink) !important;
+}
+.stButton button[kind="secondary"]:hover, .stFormSubmitButton button[kind="secondaryFormSubmit"]:hover,
+button[kind="secondary"]:hover, button[kind="secondaryFormSubmit"]:hover {
+    background: #E8E2D5 !important;
+    color: var(--ink) !important;
+}
+
+/* Fix browser autofill colour — was rendering olive/yellow */
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus,
+input:-webkit-autofill:active, textarea:-webkit-autofill, select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px var(--card) inset !important;
+    -webkit-text-fill-color: var(--ink) !important;
+    caret-color: var(--ink) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 .stDownloadButton button { background: transparent; color: var(--ink);
                            border: 1px solid var(--border-strong); border-radius: 2px; }
 hr { border-color: var(--border); }
@@ -816,32 +855,90 @@ def render_landing():
              Built for supervisors averaging 60-hour weeks who'd like to stop.</p>
         </div>
         <div class="landing-visual">
-          <div class="landing-visual-track">
-            <div class="landing-visual-stage done">
-              <div class="landing-visual-dot"></div>
-              <div><span class="landing-visual-label">Draft</span>
-                <span class="landing-visual-meta">submitted via wizard</span></div>
-            </div>
-            <div class="landing-visual-stage done">
-              <div class="landing-visual-dot"></div>
-              <div><span class="landing-visual-label">Peer Review</span>
-                <span class="landing-visual-meta">team member</span></div>
-            </div>
-            <div class="landing-visual-stage done">
-              <div class="landing-visual-dot"></div>
-              <div><span class="landing-visual-label">Team Lead Review</span>
-                <span class="landing-visual-meta">auto-assigned by expertise</span></div>
-            </div>
-            <div class="landing-visual-stage active">
-              <div class="landing-visual-dot"></div>
-              <div><span class="landing-visual-label">Final QA / QC</span>
-                <span class="landing-visual-meta">you, only what reaches here</span></div>
-            </div>
-            <div class="landing-visual-stage">
-              <div class="landing-visual-dot"></div>
-              <div><span class="landing-visual-label" style="color:var(--muted)">Approved</span></div>
-            </div>
-          </div>
+          <svg viewBox="0 0 400 460" width="100%" xmlns="http://www.w3.org/2000/svg"
+               style="display:block; max-width: 440px; margin: 0 auto">
+            <!-- Title -->
+            <text x="200" y="22" text-anchor="middle"
+                  font-family="Manrope" font-size="9" letter-spacing="3"
+                  fill="#A89E85">D E C I S I O N · T R E E</text>
+
+            <!-- Question 1 -->
+            <text x="200" y="52" text-anchor="middle"
+                  font-family="Instrument Serif" font-style="italic" font-size="14"
+                  fill="#5A5A5A">What's being submitted?</text>
+
+            <!-- Root node -->
+            <circle cx="200" cy="80" r="7" fill="#1A1A1A"/>
+            <text x="200" y="103" text-anchor="middle"
+                  font-family="Manrope" font-size="10" font-weight="600"
+                  letter-spacing="2" fill="#1A1A1A">SUBMISSION</text>
+
+            <!-- Branches to level 1 — Change path highlighted -->
+            <line x1="200" y1="87" x2="100" y2="148" stroke="#D4CCB9" stroke-width="1.5"/>
+            <line x1="200" y1="87" x2="300" y2="148" stroke="#A0432C" stroke-width="2.5"/>
+
+            <!-- Level 1 nodes -->
+            <circle cx="100" cy="154" r="5" fill="#D4CCB9"/>
+            <text x="100" y="174" text-anchor="middle"
+                  font-family="Manrope" font-size="11" fill="#8A8A8A">Schedule</text>
+
+            <circle cx="300" cy="154" r="6" fill="#A0432C">
+              <animate attributeName="r" values="6;9;6" dur="2.4s" repeatCount="indefinite"/>
+              <animate attributeName="fill-opacity" values="1;0.5;1" dur="2.4s" repeatCount="indefinite"/>
+            </circle>
+            <text x="300" y="174" text-anchor="middle"
+                  font-family="Manrope" font-size="11" font-weight="600" fill="#1A1A1A">Change request</text>
+
+            <!-- Question 2 -->
+            <text x="300" y="208" text-anchor="middle"
+                  font-family="Instrument Serif" font-style="italic" font-size="13"
+                  fill="#5A5A5A">How urgent? How risky?</text>
+
+            <!-- Branches to level 2 — Normal path highlighted -->
+            <line x1="300" y1="160" x2="220" y2="240" stroke="#D4CCB9" stroke-width="1.5"/>
+            <line x1="300" y1="160" x2="300" y2="240" stroke="#A0432C" stroke-width="2.5"/>
+            <line x1="300" y1="160" x2="380" y2="240" stroke="#D4CCB9" stroke-width="1.5"/>
+
+            <!-- Level 2 nodes -->
+            <circle cx="220" cy="246" r="4" fill="#D4CCB9"/>
+            <text x="220" y="263" text-anchor="middle"
+                  font-family="Manrope" font-size="10" fill="#8A8A8A">Standard</text>
+
+            <circle cx="300" cy="246" r="5" fill="#A0432C">
+              <animate attributeName="r" values="5;8;5" dur="2.4s" begin="0.3s" repeatCount="indefinite"/>
+              <animate attributeName="fill-opacity" values="1;0.5;1" dur="2.4s" begin="0.3s" repeatCount="indefinite"/>
+            </circle>
+            <text x="300" y="263" text-anchor="middle"
+                  font-family="Manrope" font-size="10" font-weight="600" fill="#1A1A1A">Normal</text>
+
+            <circle cx="380" cy="246" r="4" fill="#D4CCB9"/>
+            <text x="380" y="263" text-anchor="middle"
+                  font-family="Manrope" font-size="10" fill="#8A8A8A">Major</text>
+
+            <!-- Connector to outcome -->
+            <line x1="300" y1="251" x2="300" y2="310" stroke="#A0432C"
+                  stroke-width="2" stroke-dasharray="3 4"/>
+
+            <!-- Outcome card -->
+            <rect x="120" y="312" width="280" height="118" rx="4"
+                  fill="#F2E5DE" stroke="#A0432C" stroke-width="1"/>
+            <text x="260" y="338" text-anchor="middle"
+                  font-family="Manrope" font-size="9" letter-spacing="2.5" fill="#A0432C">R O U T E D · T O</text>
+            <text x="260" y="370" text-anchor="middle"
+                  font-family="Instrument Serif" font-size="26" fill="#1A1A1A">Normal Change</text>
+            <text x="260" y="398" text-anchor="middle"
+                  font-family="Manrope" font-size="11" fill="#5A5A5A">10 business day SLA</text>
+            <text x="260" y="418" text-anchor="middle"
+                  font-family="Manrope" font-size="11" fill="#5A5A5A">Team Lead + Change Manager</text>
+
+            <!-- Travelling dot along active path -->
+            <circle r="3.5" fill="#A0432C">
+              <animateMotion dur="3.2s" repeatCount="indefinite"
+                              path="M 0,0 L 100,61 L 100,159 L 100,225"
+                              rotate="auto"/>
+              <animate attributeName="opacity" values="0;1;1;1;0" dur="3.2s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
         </div>
       </div>
 
