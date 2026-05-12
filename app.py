@@ -100,8 +100,31 @@ html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, label,
 .risk-bar { height: 4px; background: var(--border); border-radius: 2px;
             overflow: hidden; margin: 6px 0; }
 .risk-fill { height: 100%; }
-[data-testid="stSidebar"] { background: var(--card); border-right: 1px solid var(--border); }
+[data-testid="stSidebar"] { background: var(--card) !important; border-right: 1px solid var(--border); }
 [data-testid="stSidebar"] .display { font-size: 22px; }
+
+/* Force light theme everywhere — overrides Streamlit dark mode if user/system has it on */
+.stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], .main, .block-container {
+    background-color: var(--cream) !important;
+    color: var(--ink) !important;
+}
+[data-testid="stHeader"] { background-color: var(--cream) !important; }
+[data-testid="stSidebar"] *, [data-testid="stSidebar"] label, [data-testid="stSidebar"] p,
+[data-testid="stSidebar"] .stRadio label, [data-testid="stSidebar"] [data-baseweb="radio"] label {
+    color: var(--ink) !important;
+}
+.stApp p, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
+.stApp span:not(.pill):not(.role-pill):not(.backend-badge) {
+    color: var(--ink);
+}
+/* Form inputs — light background, ink text */
+.stTextInput input, .stTextArea textarea, .stSelectbox [data-baseweb="select"],
+.stNumberInput input, .stPassword input {
+    background-color: var(--card) !important;
+    color: var(--ink) !important;
+}
+/* Expander headers */
+[data-testid="stExpander"] summary { color: var(--ink) !important; }
 .stButton button { background: var(--rust); color: var(--cream); border: none;
                    border-radius: 2px; font-weight: 500; transition: background 0.15s; }
 .stButton button:hover { background: #8a3a25; color: var(--cream); }
@@ -1317,8 +1340,15 @@ def render_pipeline():
                     else "Try clearing the filters above.")
         st.markdown(f'<div class="card" style="text-align:center;padding:48px">'
                     f'<div class="display" style="font-size:20px;margin-bottom:4px">{msg_title}</div>'
-                    f'<div style="color:var(--muted);font-size:14px">{msg_body}</div></div>',
+                    f'<div style="color:var(--muted);font-size:14px;margin-bottom:16px">{msg_body}</div></div>',
                     unsafe_allow_html=True)
+        if not items and has_perm("submit"):
+            c_l, c_c, c_r = st.columns([2, 1, 2])
+            with c_c:
+                if st.button("→ Start a submission", key="empty_to_submit",
+                              use_container_width=True):
+                    st.session_state.page = "Submit"
+                    st.rerun()
         return
 
     for item in filtered:
