@@ -825,8 +825,43 @@ def role_badge(role):
 # LANDING PAGE
 # ============================================================================
 
+# Decision tree SVG — each line at column 0 so markdown doesn't treat it as a code block
+DECISION_TREE_SVG = """<svg viewBox="0 0 400 460" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;max-width:440px;margin:0 auto">
+<text x="200" y="22" text-anchor="middle" font-family="Manrope" font-size="9" letter-spacing="3" fill="#A89E85">D E C I S I O N · T R E E</text>
+<text x="200" y="52" text-anchor="middle" font-family="Instrument Serif" font-style="italic" font-size="14" fill="#5A5A5A">What's being submitted?</text>
+<circle cx="200" cy="80" r="7" fill="#1A1A1A"/>
+<text x="200" y="103" text-anchor="middle" font-family="Manrope" font-size="10" font-weight="600" letter-spacing="2" fill="#1A1A1A">SUBMISSION</text>
+<line x1="200" y1="87" x2="100" y2="148" stroke="#D4CCB9" stroke-width="1.5"/>
+<line x1="200" y1="87" x2="300" y2="148" stroke="#A0432C" stroke-width="2.5"/>
+<circle cx="100" cy="154" r="5" fill="#D4CCB9"/>
+<text x="100" y="174" text-anchor="middle" font-family="Manrope" font-size="11" fill="#8A8A8A">Schedule</text>
+<circle cx="300" cy="154" r="6" fill="#A0432C"><animate attributeName="r" values="6;9;6" dur="2.4s" repeatCount="indefinite"/><animate attributeName="fill-opacity" values="1;0.5;1" dur="2.4s" repeatCount="indefinite"/></circle>
+<text x="300" y="174" text-anchor="middle" font-family="Manrope" font-size="11" font-weight="600" fill="#1A1A1A">Change request</text>
+<text x="300" y="208" text-anchor="middle" font-family="Instrument Serif" font-style="italic" font-size="13" fill="#5A5A5A">How urgent? How risky?</text>
+<line x1="300" y1="160" x2="220" y2="240" stroke="#D4CCB9" stroke-width="1.5"/>
+<line x1="300" y1="160" x2="300" y2="240" stroke="#A0432C" stroke-width="2.5"/>
+<line x1="300" y1="160" x2="380" y2="240" stroke="#D4CCB9" stroke-width="1.5"/>
+<circle cx="220" cy="246" r="4" fill="#D4CCB9"/>
+<text x="220" y="263" text-anchor="middle" font-family="Manrope" font-size="10" fill="#8A8A8A">Standard</text>
+<circle cx="300" cy="246" r="5" fill="#A0432C"><animate attributeName="r" values="5;8;5" dur="2.4s" begin="0.3s" repeatCount="indefinite"/><animate attributeName="fill-opacity" values="1;0.5;1" dur="2.4s" begin="0.3s" repeatCount="indefinite"/></circle>
+<text x="300" y="263" text-anchor="middle" font-family="Manrope" font-size="10" font-weight="600" fill="#1A1A1A">Normal</text>
+<circle cx="380" cy="246" r="4" fill="#D4CCB9"/>
+<text x="380" y="263" text-anchor="middle" font-family="Manrope" font-size="10" fill="#8A8A8A">Major</text>
+<line x1="300" y1="251" x2="300" y2="310" stroke="#A0432C" stroke-width="2" stroke-dasharray="3 4"/>
+<rect x="120" y="312" width="280" height="118" rx="4" fill="#F2E5DE" stroke="#A0432C" stroke-width="1"/>
+<text x="260" y="338" text-anchor="middle" font-family="Manrope" font-size="9" letter-spacing="2.5" fill="#A0432C">R O U T E D · T O</text>
+<text x="260" y="370" text-anchor="middle" font-family="Instrument Serif" font-size="26" fill="#1A1A1A">Normal Change</text>
+<text x="260" y="398" text-anchor="middle" font-family="Manrope" font-size="11" fill="#5A5A5A">10 business day SLA</text>
+<text x="260" y="418" text-anchor="middle" font-family="Manrope" font-size="11" fill="#5A5A5A">Team Lead + Change Manager</text>
+</svg>"""
+
+# Feature-block icons — small enough to keep inline
+GUIDE_ICON = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" fill-opacity="0.15"/></svg>'
+ROUTE_ICON = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'
+SURFACE_ICON = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+
+
 def render_landing():
-    # Top nav: brand + Sign In button (Streamlit columns for the button)
     nav_l, nav_r = st.columns([5, 1])
     with nav_l:
         st.markdown('<div class="landing-brand" style="padding:24px 0">'
@@ -843,155 +878,44 @@ def render_landing():
 
     st.markdown('<hr style="margin:0;border-color:var(--border)">', unsafe_allow_html=True)
 
-    # Hero
-    st.markdown("""
-    <div class="landing-wrap">
-      <div class="landing-hero">
-        <div>
-          <div class="eyebrow">A workbench for project teams</div>
-          <h1 class="landing-hero-title">Hand the<br><em>routine work</em><br>to the structure.</h1>
-          <p class="landing-hero-sub">Decision-tree wizards for scheduling and change management.
-             Reviewer routing. Document pre-screening. SLA breach alerts.
-             Built for supervisors averaging 60-hour weeks who'd like to stop.</p>
-        </div>
-        <div class="landing-visual">
-          <svg viewBox="0 0 400 460" width="100%" xmlns="http://www.w3.org/2000/svg"
-               style="display:block; max-width: 440px; margin: 0 auto">
-            <!-- Title -->
-            <text x="200" y="22" text-anchor="middle"
-                  font-family="Manrope" font-size="9" letter-spacing="3"
-                  fill="#A89E85">D E C I S I O N · T R E E</text>
+    st.markdown(f"""
+<div class="landing-wrap">
+<div class="landing-hero">
+<div>
+<div class="eyebrow">A workbench for project teams</div>
+<h1 class="landing-hero-title">Hand the<br><em>routine work</em><br>to the structure.</h1>
+<p class="landing-hero-sub">Decision-tree wizards for scheduling and change management. Reviewer routing. Document pre-screening. SLA breach alerts. Built for supervisors averaging 60-hour weeks who'd like to stop.</p>
+</div>
+<div class="landing-visual">{DECISION_TREE_SVG}</div>
+</div>
+<div class="landing-features">
+<div class="landing-feature">
+<div class="feature-icon">{GUIDE_ICON}</div>
+<div class="feature-num">i.</div>
+<h3>Guide</h3>
+<p>Six checkpoint questions route your team to the right schedule template. Five route them to the right change classification. The decision tree is configurable — adjust tags to change routing without touching code.</p>
+</div>
+<div class="landing-feature">
+<div class="feature-icon">{ROUTE_ICON}</div>
+<div class="feature-num">ii.</div>
+<h3>Route</h3>
+<p>Submissions auto-assign to the best-fit reviewer based on expertise overlap and current load. Three workflow types, configurable approval chains, capacity-aware. Reviewers see only their queue.</p>
+</div>
+<div class="landing-feature">
+<div class="feature-icon">{SURFACE_ICON}</div>
+<div class="feature-num">iii.</div>
+<h3>Surface</h3>
+<p>SLA breaches flag in red on every page. The Gantt timeline reveals aging items at a glance. Claude pre-screens uploaded documents so your team leads see focused reviews instead of blank pages.</p>
+</div>
+</div>
+<div class="landing-closing">
+<h2 class="landing-closing-title">You'll see <em>only what reaches Final QA</em>.</h2>
+<p class="landing-closing-body">That's the point. Everything else is handled by structure, scoring, and reviewers who know what they're looking at. Sixty-hour weeks become forty when the routine work stops landing on your desk.</p>
+</div>
+<div class="landing-footer">Hughes Guide · v1.2</div>
+</div>
+""", unsafe_allow_html=True)
 
-            <!-- Question 1 -->
-            <text x="200" y="52" text-anchor="middle"
-                  font-family="Instrument Serif" font-style="italic" font-size="14"
-                  fill="#5A5A5A">What's being submitted?</text>
-
-            <!-- Root node -->
-            <circle cx="200" cy="80" r="7" fill="#1A1A1A"/>
-            <text x="200" y="103" text-anchor="middle"
-                  font-family="Manrope" font-size="10" font-weight="600"
-                  letter-spacing="2" fill="#1A1A1A">SUBMISSION</text>
-
-            <!-- Branches to level 1 — Change path highlighted -->
-            <line x1="200" y1="87" x2="100" y2="148" stroke="#D4CCB9" stroke-width="1.5"/>
-            <line x1="200" y1="87" x2="300" y2="148" stroke="#A0432C" stroke-width="2.5"/>
-
-            <!-- Level 1 nodes -->
-            <circle cx="100" cy="154" r="5" fill="#D4CCB9"/>
-            <text x="100" y="174" text-anchor="middle"
-                  font-family="Manrope" font-size="11" fill="#8A8A8A">Schedule</text>
-
-            <circle cx="300" cy="154" r="6" fill="#A0432C">
-              <animate attributeName="r" values="6;9;6" dur="2.4s" repeatCount="indefinite"/>
-              <animate attributeName="fill-opacity" values="1;0.5;1" dur="2.4s" repeatCount="indefinite"/>
-            </circle>
-            <text x="300" y="174" text-anchor="middle"
-                  font-family="Manrope" font-size="11" font-weight="600" fill="#1A1A1A">Change request</text>
-
-            <!-- Question 2 -->
-            <text x="300" y="208" text-anchor="middle"
-                  font-family="Instrument Serif" font-style="italic" font-size="13"
-                  fill="#5A5A5A">How urgent? How risky?</text>
-
-            <!-- Branches to level 2 — Normal path highlighted -->
-            <line x1="300" y1="160" x2="220" y2="240" stroke="#D4CCB9" stroke-width="1.5"/>
-            <line x1="300" y1="160" x2="300" y2="240" stroke="#A0432C" stroke-width="2.5"/>
-            <line x1="300" y1="160" x2="380" y2="240" stroke="#D4CCB9" stroke-width="1.5"/>
-
-            <!-- Level 2 nodes -->
-            <circle cx="220" cy="246" r="4" fill="#D4CCB9"/>
-            <text x="220" y="263" text-anchor="middle"
-                  font-family="Manrope" font-size="10" fill="#8A8A8A">Standard</text>
-
-            <circle cx="300" cy="246" r="5" fill="#A0432C">
-              <animate attributeName="r" values="5;8;5" dur="2.4s" begin="0.3s" repeatCount="indefinite"/>
-              <animate attributeName="fill-opacity" values="1;0.5;1" dur="2.4s" begin="0.3s" repeatCount="indefinite"/>
-            </circle>
-            <text x="300" y="263" text-anchor="middle"
-                  font-family="Manrope" font-size="10" font-weight="600" fill="#1A1A1A">Normal</text>
-
-            <circle cx="380" cy="246" r="4" fill="#D4CCB9"/>
-            <text x="380" y="263" text-anchor="middle"
-                  font-family="Manrope" font-size="10" fill="#8A8A8A">Major</text>
-
-            <!-- Connector to outcome -->
-            <line x1="300" y1="251" x2="300" y2="310" stroke="#A0432C"
-                  stroke-width="2" stroke-dasharray="3 4"/>
-
-            <!-- Outcome card -->
-            <rect x="120" y="312" width="280" height="118" rx="4"
-                  fill="#F2E5DE" stroke="#A0432C" stroke-width="1"/>
-            <text x="260" y="338" text-anchor="middle"
-                  font-family="Manrope" font-size="9" letter-spacing="2.5" fill="#A0432C">R O U T E D · T O</text>
-            <text x="260" y="370" text-anchor="middle"
-                  font-family="Instrument Serif" font-size="26" fill="#1A1A1A">Normal Change</text>
-            <text x="260" y="398" text-anchor="middle"
-                  font-family="Manrope" font-size="11" fill="#5A5A5A">10 business day SLA</text>
-            <text x="260" y="418" text-anchor="middle"
-                  font-family="Manrope" font-size="11" fill="#5A5A5A">Team Lead + Change Manager</text>
-
-            <!-- Travelling dot along active path -->
-            <circle r="3.5" fill="#A0432C">
-              <animateMotion dur="3.2s" repeatCount="indefinite"
-                              path="M 0,0 L 100,61 L 100,159 L 100,225"
-                              rotate="auto"/>
-              <animate attributeName="opacity" values="0;1;1;1;0" dur="3.2s" repeatCount="indefinite"/>
-            </circle>
-          </svg>
-        </div>
-      </div>
-
-      <div class="landing-features">
-        <div class="landing-feature">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" fill-opacity="0.15"/>
-            </svg>
-          </div>
-          <div class="feature-num">i.</div>
-          <h3>Guide</h3>
-          <p>Six checkpoint questions route your team to the right schedule template. Five route them to the right change classification. The decision tree is configurable — adjust tags to change routing without touching code.</p>
-        </div>
-        <div class="landing-feature">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="18" cy="5" r="3"/>
-              <circle cx="6" cy="12" r="3"/>
-              <circle cx="18" cy="19" r="3"/>
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-            </svg>
-          </div>
-          <div class="feature-num">ii.</div>
-          <h3>Route</h3>
-          <p>Submissions auto-assign to the best-fit reviewer based on expertise overlap and current load. Three workflow types, configurable approval chains, capacity-aware. Reviewers see only their queue.</p>
-        </div>
-        <div class="landing-feature">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-          </div>
-          <div class="feature-num">iii.</div>
-          <h3>Surface</h3>
-          <p>SLA breaches flag in red on every page. The Gantt timeline reveals aging items at a glance. Claude pre-screens uploaded documents so your team leads see focused reviews instead of blank pages.</p>
-        </div>
-      </div>
-
-      <div class="landing-closing">
-        <h2 class="landing-closing-title">You'll see <em>only what reaches Final QA</em>.</h2>
-        <p class="landing-closing-body">That's the point. Everything else is handled by structure, scoring, and reviewers who know what they're looking at. Sixty-hour weeks become forty when the routine work stops landing on your desk.</p>
-      </div>
-
-      <div class="landing-footer">Hughes Guide · v1.2</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Bottom CTA
     cta_l, cta_c, cta_r = st.columns([2, 1, 2])
     with cta_c:
         if st.button("Sign in →", key="landing_signin_bottom",
