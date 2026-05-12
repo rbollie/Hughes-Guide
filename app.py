@@ -99,15 +99,41 @@ span[aria-hidden="true"][class*="st-emotion"] {
 .pill.warn { background: #F5E6CC; color: #8a5a1a; }
 .pill.danger { background: #F2D9D2; color: #8a2515; font-weight: 600; }
 .card { background: var(--card); border: 1px solid var(--border);
-        border-radius: 3px; padding: 16px 20px; margin-bottom: 12px; }
+        border-radius: 3px; padding: 18px 22px; margin-bottom: 14px;
+        transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s; }
+.card:hover { border-color: var(--border-strong); transform: translateY(-1px);
+              box-shadow: 0 2px 12px rgba(26, 26, 26, 0.04); }
+.card.feature { position: relative; overflow: hidden; }
+.card.feature::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+                          background: var(--rust); }
+
 .stat-card { background: var(--card); border: 1px solid var(--border);
-             border-radius: 3px; padding: 14px; }
+             border-radius: 3px; padding: 18px; position: relative;
+             transition: border-color 0.18s, transform 0.18s; }
+.stat-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
 .stat-card.accent { background: var(--rust-soft); border-color: var(--rust); }
 .stat-card.danger { background: #F2D9D2; border-color: #8a2515; }
-.stat-value { font-family: 'Instrument Serif', Georgia, serif; font-size: 36px;
-              line-height: 1; color: var(--ink); }
-.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
-              color: var(--muted); margin-bottom: 4px; }
+.stat-card .stat-icon { position: absolute; top: 14px; right: 14px;
+                         width: 22px; height: 22px; color: var(--rust); opacity: 0.55; }
+.stat-card .stat-icon svg { width: 22px; height: 22px; }
+.stat-card.danger .stat-icon { color: #8a2515; opacity: 0.7; }
+.stat-value { font-family: 'Instrument Serif', Georgia, serif; font-size: 44px;
+              line-height: 1; color: var(--ink); margin-top: 2px; }
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+              color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+
+/* Page header — dramatic title + decorative rule */
+.page-header { margin: 0 0 28px 0; }
+.page-title { font-size: 44px !important; margin: 4px 0 14px 0 !important; line-height: 1.05; }
+.page-ornament { width: 48px; height: 2px; background: var(--rust); margin: 0 0 14px 0; }
+
+/* Section divider with serif flourish */
+.section-divider { display: flex; align-items: center; gap: 16px;
+                    margin: 36px 0 24px 0; color: var(--muted); }
+.section-divider::before, .section-divider::after { content: ""; flex: 1;
+                                                       height: 1px; background: var(--border); }
+.section-divider-mark { font-family: 'Instrument Serif', serif; font-style: italic;
+                         font-size: 18px; color: var(--rust); }
 .risk-bar { height: 4px; background: var(--border); border-radius: 2px;
             overflow: hidden; margin: 6px 0; }
 .risk-fill { height: 100%; }
@@ -779,23 +805,45 @@ def pick_reviewer(reviewers, items, template_or_type):
     scored.sort(key=lambda x: x[1], reverse=True)
     return scored[0][0] if scored else (reviewers[0] if reviewers else None)
 
+# Stat-card icons (compact 20px)
+STAT_ICONS = {
+    "pipeline": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    "qa":       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+    "schedule": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    "change":   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+    "alert":    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+}
+
 # ============================================================================
 # UI HELPERS
 # ============================================================================
 def pill(text, tone="neutral"):
     return f'<span class="pill {tone}">{text}</span>'
 
-def section_title(eyebrow, title):
-    st.markdown(f'<div class="eyebrow">{eyebrow}</div>'
-                f'<h1 class="display" style="font-size:36px;margin:0 0 24px 0">{title}</h1>',
-                unsafe_allow_html=True)
+def section_title(eyebrow, title, kicker=None):
+    """Page header with decorative ornament. `kicker` is optional small text under title."""
+    kicker_html = (f'<div style="color:var(--muted);font-size:14px;'
+                   f'margin:-12px 0 18px 0;max-width:580px">{kicker}</div>'
+                   if kicker else "")
+    st.markdown(
+        f'<div class="page-header">'
+        f'<div class="eyebrow">{eyebrow}</div>'
+        f'<h1 class="display page-title">{title}</h1>'
+        f'<div class="page-ornament"></div>'
+        f'{kicker_html}'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
-def stat_card(label, value, tone=None):
+def stat_card(label, value, tone=None, icon_key=None):
     cls = "stat-card"
     if tone == "accent": cls += " accent"
     if tone == "danger": cls += " danger"
-    return f'<div class="{cls}"><div class="stat-label">{label}</div>'\
-           f'<div class="stat-value">{value}</div></div>'
+    icon_svg = STAT_ICONS.get(icon_key, "") if icon_key else ""
+    icon_html = (f'<div class="stat-icon">{icon_svg}</div>' if icon_svg else "")
+    return (f'<div class="{cls}">{icon_html}'
+            f'<div class="stat-label">{label}</div>'
+            f'<div class="stat-value">{value}</div></div>')
 
 def risk_bar(score):
     pct = (score / 10) * 100
@@ -1047,8 +1095,10 @@ def render_home():
     greet = f"Welcome back, {user['name']}." if user else "Hand the routine work to the structure."
 
     st.markdown('<div class="eyebrow">Today at the bench</div>'
-                f'<h1 class="display" style="font-size:42px;margin:0 0 8px 0">{greet}</h1>'
-                '<p style="color:var(--muted);max-width:640px;margin-bottom:32px">'
+                f'<h1 class="display" style="font-size:54px;margin:0 0 14px 0;line-height:1.05">{greet}</h1>'
+                '<div style="width:48px;height:2px;background:var(--rust);margin:0 0 18px 0"></div>'
+                '<p style="color:var(--muted);max-width:640px;margin-bottom:32px;'
+                'font-size:16px;line-height:1.55">'
                 "Wizards guide your teams to the right template or change type. "
                 "Reviewers see clean, scored submissions. You see only what reaches Final QA.</p>",
                 unsafe_allow_html=True)
@@ -1067,14 +1117,18 @@ def render_home():
     qa_label = "Awaiting your QA" if is_admin() else "At Final QA"
 
     cols = st.columns(5 if st.session_state.features.get("slaTracking") else 4)
-    cols[0].markdown(stat_card("In pipeline", total - approved), unsafe_allow_html=True)
-    cols[1].markdown(stat_card(qa_label, mine_qa, tone="accent" if is_admin() else None),
+    cols[0].markdown(stat_card("In pipeline", total - approved, icon_key="pipeline"),
                      unsafe_allow_html=True)
-    cols[2].markdown(stat_card("Schedules", by_type.get("schedule", 0)), unsafe_allow_html=True)
-    cols[3].markdown(stat_card("Change requests", by_type.get("change", 0)), unsafe_allow_html=True)
+    cols[1].markdown(stat_card(qa_label, mine_qa, tone="accent" if is_admin() else None,
+                                icon_key="qa"), unsafe_allow_html=True)
+    cols[2].markdown(stat_card("Schedules", by_type.get("schedule", 0), icon_key="schedule"),
+                     unsafe_allow_html=True)
+    cols[3].markdown(stat_card("Change requests", by_type.get("change", 0), icon_key="change"),
+                     unsafe_allow_html=True)
     if st.session_state.features.get("slaTracking"):
         cols[4].markdown(stat_card("SLA breaches", breaches,
-                                   tone="danger" if breaches > 0 else None),
+                                   tone="danger" if breaches > 0 else None,
+                                   icon_key="alert"),
                          unsafe_allow_html=True)
 
     if breaches > 0:
@@ -1090,27 +1144,54 @@ def render_home():
     if has_perm("submit"): actions_cols.append("submit")
     if has_perm("view_all") or has_perm("view_own"): actions_cols.append("pipeline")
     if actions_cols:
+        st.markdown('<div class="section-divider">'
+                    '<span class="section-divider-mark">&iexcl;</span>'
+                    '<span style="font-size:11px;text-transform:uppercase;letter-spacing:0.15em;'
+                    'color:var(--muted);font-weight:600">Take action</span>'
+                    '<span class="section-divider-mark">!</span>'
+                    '</div>', unsafe_allow_html=True)
         cols = st.columns(len(actions_cols))
         for i, key in enumerate(actions_cols):
             with cols[i]:
                 if key == "submit":
-                    st.markdown('<div class="card"><div class="eyebrow">Get started</div>'
-                                '<div class="display" style="font-size:22px;margin-bottom:6px">'
+                    st.markdown('<div class="card feature" style="padding:24px">'
+                                '<div style="display:inline-flex;align-items:center;'
+                                'justify-content:center;width:48px;height:48px;border-radius:50%;'
+                                'background:var(--rust-soft);color:var(--rust);margin-bottom:14px">'
+                                '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" '
+                                'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '
+                                'stroke-linejoin="round">'
+                                '<line x1="12" y1="5" x2="12" y2="19"/>'
+                                '<line x1="5" y1="12" x2="19" y2="12"/></svg></div>'
+                                '<div class="eyebrow">Get started</div>'
+                                '<div class="display" style="font-size:26px;margin:4px 0 8px 0">'
                                 "Submit something new</div>"
-                                "<p style='color:var(--muted);font-size:14px;margin-bottom:12px'>"
-                                "Run a team member through the schedule or change request wizard.</p></div>",
+                                "<p style='color:var(--muted);font-size:14px;margin-bottom:14px;"
+                                "line-height:1.5'>Run a team member through the schedule or "
+                                "change request wizard.</p></div>",
                                 unsafe_allow_html=True)
-                    if st.button("Open Submit →", key="goto_submit"):
+                    if st.button("Open Submit →", key="goto_submit",
+                                  use_container_width=True):
                         st.session_state.page = "Submit"
                         st.rerun()
                 else:
-                    st.markdown('<div class="card"><div class="eyebrow">Track</div>'
-                                '<div class="display" style="font-size:22px;margin-bottom:6px">'
+                    st.markdown('<div class="card feature" style="padding:24px">'
+                                '<div style="display:inline-flex;align-items:center;'
+                                'justify-content:center;width:48px;height:48px;border-radius:50%;'
+                                'background:#E0E5DA;color:#4A5A3A;margin-bottom:14px">'
+                                '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" '
+                                'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '
+                                'stroke-linejoin="round">'
+                                '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>'
+                                '<div class="eyebrow">Track</div>'
+                                '<div class="display" style="font-size:26px;margin:4px 0 8px 0">'
                                 "Check the pipeline</div>"
-                                "<p style='color:var(--muted);font-size:14px;margin-bottom:12px'>"
-                                "See where every item is, who's reviewing, and what's blocked.</p></div>",
+                                "<p style='color:var(--muted);font-size:14px;margin-bottom:14px;"
+                                "line-height:1.5'>See where every item is, who's reviewing, "
+                                "and what's blocked.</p></div>",
                                 unsafe_allow_html=True)
-                    if st.button("Open Pipeline →", key="goto_pipeline"):
+                    if st.button("Open Pipeline →", key="goto_pipeline",
+                                  use_container_width=True):
                         st.session_state.page = "Pipeline"
                         st.rerun()
 
