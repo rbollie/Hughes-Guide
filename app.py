@@ -409,7 +409,7 @@ def load_all_state():
     mapping = {
         "features": DEFAULT_FEATURES, "workflows": DEFAULT_WORKFLOWS,
         "templates": DEFAULT_TEMPLATES, "change_types": DEFAULT_CHANGE_TYPES,
-        "reviewers": DEFAULT_REVIEWERS, "items": [], "users": [],
+        "reviewers": DEFAULT_REVIEWERS, "submissions": [], "users": [],
     }
     for k, default in mapping.items():
         if k not in st.session_state:
@@ -918,7 +918,7 @@ def render_home():
                 "Reviewers see clean, scored submissions. You see only what reaches Final QA.</p>",
                 unsafe_allow_html=True)
 
-    all_items = st.session_state.items
+    all_items = st.session_state.submissions
     items = visible_items(all_items)
     total = len(items)
     by_type = {"schedule": 0, "change": 0}
@@ -1003,7 +1003,7 @@ def render_home():
             "exportedAt": datetime.utcnow().isoformat(),
             "features": st.session_state.features, "workflows": st.session_state.workflows,
             "templates": st.session_state.templates, "change_types": st.session_state.change_types,
-            "reviewers": st.session_state.reviewers, "items": st.session_state.items,
+            "reviewers": st.session_state.reviewers, "submissions": st.session_state.submissions,
         }
         if is_admin():
             # Include users only in admin export (with hashes intact)
@@ -1194,7 +1194,7 @@ def render_wizard(kind):
         auto_rev = None
         if st.session_state.features.get("autoAssignment"):
             auto_rev = pick_reviewer(st.session_state.reviewers,
-                                     st.session_state.items, chosen)
+                                     st.session_state.submissions, chosen)
             if auto_rev:
                 st.markdown(f"<div style='font-size:12px;color:var(--muted);margin-top:4px'>"
                             f"👤 Auto-assigned reviewer: "
@@ -1226,8 +1226,8 @@ def render_wizard(kind):
                     "currentStage": wf["stages"][0], "history": [],
                     "createdAt": int(datetime.utcnow().timestamp() * 1000),
                 }
-                st.session_state.items = [item, *st.session_state.items]
-                persist("items")
+                st.session_state.submissions = [item, *st.session_state.submissions]
+                persist("submissions")
                 for k in ("wizard_kind", "wizard_step", "wizard_answers", "wizard_chosen"):
                     if k in st.session_state: del st.session_state[k]
                 st.session_state.page = "Pipeline"
@@ -1247,7 +1247,7 @@ def can_advance_from(stage):
 
 
 def render_pipeline():
-    items = visible_items(st.session_state.items)
+    items = visible_items(st.session_state.submissions)
 
     if st.session_state.get("detail_id"):
         item = next((i for i in items if i["id"] == st.session_state.detail_id), None)
@@ -1474,7 +1474,7 @@ def render_item_detail(item):
                     event_made = (stages[0], f"Reopened to {STAGE_LABELS[stages[0]]}")
 
                 if event_made:
-                    items = st.session_state.items
+                    items = st.session_state.submissions
                     user = current_user()
                     for idx, i in enumerate(items):
                         if i["id"] == item["id"]:
@@ -1486,8 +1486,8 @@ def render_item_detail(item):
                                 "note": note.strip(),
                             })
                             break
-                    st.session_state.items = items
-                    persist("items")
+                    st.session_state.submissions = items
+                    persist("submissions")
                     st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
         else:
@@ -1501,7 +1501,7 @@ def render_item_detail(item):
 # ============================================================================
 def render_timeline():
     section_title("Pipeline aging", "Timeline")
-    items = visible_items(st.session_state.items)
+    items = visible_items(st.session_state.submissions)
     if not items:
         st.markdown('<div class="card" style="text-align:center;padding:48px">'
                     '<div style="color:var(--muted)">'
@@ -1786,8 +1786,11 @@ def render_settings():
     if uploaded:
         try:
             data = json.load(uploaded)
+            # Backward compat: older exports used "items" instead of "submissions"
+            if "items" in data and "submissions" not in data:
+                data["submissions"] = data.pop("items")
             for k in ("features", "workflows", "templates", "change_types",
-                      "reviewers", "items", "users"):
+                      "reviewers", "submissions", "users"):
                 if k in data:
                     st.session_state[k] = data[k]
                     persist(k)
@@ -1810,8 +1813,8 @@ def render_settings():
         st.session_state.change_types = [t.copy() for t in DEFAULT_CHANGE_TYPES]
         st.session_state.reviewers = [r.copy() for r in DEFAULT_REVIEWERS]
         st.session_state.workflows = [w.copy() for w in DEFAULT_WORKFLOWS]
-        st.session_state.items = []
-        for k in ("features", "templates", "change_types", "reviewers", "workflows", "items"):
+        st.session_state.submissions = []
+        for k in ("features", "templates", "change_types", "reviewers", "workflows", "submissions"):
             persist(k)
         st.success("Data reset.")
         st.rerun()
@@ -2067,7 +2070,7 @@ def render_authenticated_app():
 
         # SLA breach badge
         if st.session_state.features.get("slaTracking") and has_perm("view_all"):
-            breaches = count_breaches(st.session_state.items)
+            breaches = count_breaches(st.session_state.submissions)
             if breaches > 0:
                 st.markdown(f'<div style="margin-top:16px;padding:8px 12px;'
                             f'background:#F2D9D2;border:1px solid #8a2515;border-radius:2px;'
