@@ -70,7 +70,10 @@ st.markdown("""
 html, body, [class*="css"], .stApp, .stMarkdown, p, div, label,
 .stSelectbox, .stRadio, .stTextInput, .stTextArea, .stButton, .stDownloadButton {
     font-family: 'Manrope', system-ui, sans-serif !important;
+    font-weight: 500;
+    font-size: 15px;
 }
+.stApp p, .stApp label { font-size: 15px; font-weight: 500; }
 /* Preserve Material Icons / Symbols fonts — Streamlit uses these for chevrons, upload, close, etc. */
 .material-symbols-rounded, .material-symbols-outlined, .material-icons,
 [class*="material-symbols"], [class*="material-icons"],
@@ -82,13 +85,14 @@ span[aria-hidden="true"][class*="st-emotion"] {
     font-family: 'Instrument Serif', Georgia, serif !important;
     font-weight: 400; color: var(--ink); line-height: 1.15;
 }
-.eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em;
-           color: var(--rust); margin-bottom: 4px; }
-.label   { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
-           color: var(--muted); margin-bottom: 4px; font-weight: 500; }
-.pill { display: inline-block; padding: 2px 8px; font-size: 10px;
+.eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+           color: var(--rust); margin-bottom: 4px; font-weight: 600; }
+.label   { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+           color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+.pill { display: inline-block; padding: 3px 9px; font-size: 11px;
         text-transform: uppercase; letter-spacing: 0.05em; border-radius: 2px;
-        background: #E8E2D5; color: #3A3A3A; margin-right: 4px; margin-bottom: 4px; }
+        background: #E8E2D5; color: #3A3A3A; margin-right: 4px; margin-bottom: 4px;
+        font-weight: 600; }
 .pill.rust { background: var(--rust-soft); color: var(--rust); }
 .pill.ink  { background: var(--ink); color: var(--cream); }
 .pill.moss { background: #E0E5DA; color: #4A5A3A; }
@@ -252,15 +256,41 @@ footer { visibility: hidden; height: 0; }
 
 .landing-features { padding: 60px 0 40px; border-top: 1px solid var(--border);
                     display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+
+/* Benefits strip — 4 small icons between hero and features */
+.landing-benefits { padding: 32px 0; border-top: 1px solid var(--border);
+                     display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.landing-benefit { display: flex; align-items: center; gap: 12px; }
+.landing-benefit-icon { flex-shrink: 0; width: 40px; height: 40px;
+                         display: inline-flex; align-items: center; justify-content: center;
+                         border: 1px solid var(--border-strong); border-radius: 50%;
+                         color: var(--rust); }
+.landing-benefit-icon svg { width: 20px; height: 20px; }
+.landing-benefit-text { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+                         color: var(--ink); font-weight: 700; line-height: 1.3; }
+.landing-benefit-sub { font-size: 10px; color: var(--muted); text-transform: none;
+                        letter-spacing: 0; font-weight: 500; margin-top: 2px;
+                        text-transform: none; }
+@media (max-width: 900px) {
+    .landing-benefits { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Login card lock icon */
+.login-card-icon { display: inline-flex; align-items: center; justify-content: center;
+                    width: 56px; height: 56px; border-radius: 50%;
+                    background: var(--rust-soft); color: var(--rust);
+                    margin-bottom: 20px; }
+.login-card-icon svg { width: 28px; height: 28px; }
 .landing-feature h3 { font-family: 'Instrument Serif', serif; font-size: 32px;
                        margin: 0 0 12px; color: var(--ink); }
 .landing-feature p  { font-size: 14px; color: var(--muted); line-height: 1.6; margin: 0; }
 .landing-feature .feature-num { font-family: 'Instrument Serif', serif; font-style: italic;
                                   color: var(--rust); font-size: 14px; }
-.landing-feature .feature-icon { color: var(--rust); margin-bottom: 16px;
+.landing-feature .feature-icon { color: var(--rust); margin-bottom: 18px;
                                   display: inline-flex; align-items: center; justify-content: center;
-                                  width: 56px; height: 56px; border-radius: 50%;
+                                  width: 80px; height: 80px; border-radius: 50%;
                                   background: var(--rust-soft); }
+.landing-feature .feature-icon svg { width: 44px; height: 44px; }
 
 .landing-closing { padding: 80px 0 40px; border-top: 1px solid var(--border); }
 .landing-closing-title { font-family: 'Instrument Serif', serif; font-size: 42px; line-height: 1.1;
@@ -406,14 +436,7 @@ CHANGE_QUESTIONS = [
         ("yes", "Yes — pre-approved or repeatable"),
         ("no", "No — novel change")]},
 ]
-DEFAULT_REVIEWERS = [
-    {"id": "r1", "name": "Aisha Okonkwo", "role": "Team Lead",
-     "expertise": ["software", "iterative", "medium-team"], "capacity": 4},
-    {"id": "r2", "name": "Daniel Reyes", "role": "Team Lead",
-     "expertise": ["infra", "regulated", "large-team", "fixed-scope"], "capacity": 4},
-    {"id": "r3", "name": "Priya Shankar", "role": "Team Lead",
-     "expertise": ["process", "research", "small-team", "uncertain-scope"], "capacity": 3},
-]
+DEFAULT_REVIEWERS = []
 
 HIGH_RISK_TAGS = {"high", "emergency", "org", "hard", "uncertain-scope", "regulated",
                   "high-dependency", "large-team", "long-duration", "no"}
@@ -860,6 +883,14 @@ GUIDE_ICON = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke
 ROUTE_ICON = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'
 SURFACE_ICON = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
 
+# Small icons for the benefits strip
+WIZARD_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>'
+USERS_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+FILE_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'
+CLOCK_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+
+LOCK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
+
 
 def render_landing():
     nav_l, nav_r = st.columns([5, 1])
@@ -887,6 +918,12 @@ def render_landing():
 <p class="landing-hero-sub">Decision-tree wizards for scheduling and change management. Reviewer routing. Document pre-screening. SLA breach alerts. Built for supervisors averaging 60-hour weeks who'd like to stop.</p>
 </div>
 <div class="landing-visual">{DECISION_TREE_SVG}</div>
+</div>
+<div class="landing-benefits">
+<div class="landing-benefit"><div class="landing-benefit-icon">{WIZARD_ICON_SM}</div><div><div class="landing-benefit-text">Guided</div><div class="landing-benefit-sub">Decision-tree wizards</div></div></div>
+<div class="landing-benefit"><div class="landing-benefit-icon">{USERS_ICON_SM}</div><div><div class="landing-benefit-text">Auto-routed</div><div class="landing-benefit-sub">By reviewer expertise</div></div></div>
+<div class="landing-benefit"><div class="landing-benefit-icon">{FILE_ICON_SM}</div><div><div class="landing-benefit-text">Pre-screened</div><div class="landing-benefit-sub">Claude reads docs first</div></div></div>
+<div class="landing-benefit"><div class="landing-benefit-icon">{CLOCK_ICON_SM}</div><div><div class="landing-benefit-text">SLA-tracked</div><div class="landing-benefit-sub">Breaches flagged live</div></div></div>
 </div>
 <div class="landing-features">
 <div class="landing-feature">
@@ -929,10 +966,11 @@ def render_landing():
 
 def render_login():
     st.markdown('<div class="login-card-wrap">', unsafe_allow_html=True)
-    st.markdown('<div class="login-card">'
-                '<div class="eyebrow">Hughes Guide</div>'
-                '<div class="login-title">Welcome back.</div>'
-                '<div class="login-sub">Sign in to continue.</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="login-card">'
+                f'<div class="login-card-icon">{LOCK_ICON}</div>'
+                f'<div class="eyebrow">Hughes Guide</div>'
+                f'<div class="login-title">Welcome back.</div>'
+                f'<div class="login-sub">Sign in to continue.</div>', unsafe_allow_html=True)
 
     with st.form("login_form", clear_on_submit=False):
         username = st.text_input("Username", key="login_user", autocomplete="username")
@@ -1080,19 +1118,27 @@ def render_home():
     if has_perm("view_all"):
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown('<div class="label">Reviewer load</div>', unsafe_allow_html=True)
-        for r in st.session_state.reviewers:
-            load = sum(1 for i in all_items if i.get("assignedReviewer") == r["id"]
-                       and i["currentStage"] not in ("approved", "returned"))
-            cap = r.get("capacity", 1)
-            pct = min(100, (load / cap) * 100) if cap else 0
-            c1, c2, c3 = st.columns([3, 6, 1])
-            c1.markdown(f"<div style='padding-top:4px'>{r['name']}</div>",
+        if not st.session_state.reviewers:
+            empty_msg = ("No team leads configured yet. Add them in Settings → Team leads."
+                         if is_admin()
+                         else "No team leads configured yet. Ask your admin to add them.")
+            st.markdown(f'<div class="card" style="text-align:center;padding:24px">'
+                        f'<div style="color:var(--muted);font-size:13px">{empty_msg}</div></div>',
                         unsafe_allow_html=True)
-            c2.markdown(f'<div style="margin-top:10px"><div class="risk-bar">'
-                        f'<div class="risk-fill" style="width:{pct}%;background:#A0432C"></div></div></div>',
-                        unsafe_allow_html=True)
-            c3.markdown(f"<div style='padding-top:4px;text-align:right;color:var(--muted)'>"
-                        f"{load} / {cap}</div>", unsafe_allow_html=True)
+        else:
+            for r in st.session_state.reviewers:
+                load = sum(1 for i in all_items if i.get("assignedReviewer") == r["id"]
+                           and i["currentStage"] not in ("approved", "returned"))
+                cap = r.get("capacity", 1)
+                pct = min(100, (load / cap) * 100) if cap else 0
+                c1, c2, c3 = st.columns([3, 6, 1])
+                c1.markdown(f"<div style='padding-top:4px'>{r['name']}</div>",
+                            unsafe_allow_html=True)
+                c2.markdown(f'<div style="margin-top:10px"><div class="risk-bar">'
+                            f'<div class="risk-fill" style="width:{pct}%;background:#A0432C"></div></div></div>',
+                            unsafe_allow_html=True)
+                c3.markdown(f"<div style='padding-top:4px;text-align:right;color:var(--muted)'>"
+                            f"{load} / {cap}</div>", unsafe_allow_html=True)
 
     if st.session_state.features.get("workExport") and has_perm("export"):
         st.markdown("<br>", unsafe_allow_html=True)
